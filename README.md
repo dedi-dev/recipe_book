@@ -1,6 +1,6 @@
 # recipe_book
 
-A new Flutter project.
+A new Flutter project with Flutter version 3.0.1
 
 ## Getting Started
 
