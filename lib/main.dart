@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:recipe_book/page/home.dart';
 import 'package:recipe_book/page/landing_page.dart';
 
 void main() {
@@ -14,8 +15,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Recipe Book App',
-      theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'NunitoSans'),
-      home: const LandingPage(),
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        fontFamily: 'NunitoSans',
+      ),
+      initialRoute: '/',
+      routes: <String, WidgetBuilder>{
+        '/': (context) => const LandingPage(),
+        '/home': (context) => const HomePage(),
+      },
     );
   }
 }
