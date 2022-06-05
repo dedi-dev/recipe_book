@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:recipe_book/page/detail.dart';
 import 'package:recipe_book/page/home.dart';
 import 'package:recipe_book/page/landing_page.dart';
 
-void main() {
+Future main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -21,8 +24,9 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
-        '/': (context) => const LandingPage(),
-        '/home': (context) => const HomePage(),
+        LandingPage.routeName: (context) => const LandingPage(),
+        HomePage.routeName: (context) => const HomePage(),
+        DetailRecipe.routeName: ((context) => const DetailRecipe()),
       },
     );
   }

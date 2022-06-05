@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class LandingPage extends StatelessWidget {
   const LandingPage({Key? key}) : super(key: key);
 
+  static const routeName = '/';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +41,7 @@ class LandingPage extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () {
-                      Navigator.pushNamed(context, '/home');
+                      Navigator.pushReplacementNamed(context, '/home');
                     },
                     child: Container(
                       padding: const EdgeInsets.all(12),
