@@ -36,6 +36,12 @@ dependencies:
   flutter_dotenv: ^5.0.2
   dio: ^4.0.6
   cached_network_image: ^3.2.1
+  flutter_launcher_icons: ^0.9.3
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "lib/asset/image/food.jpg"
 
 dev_dependencies:
   flutter_test:
