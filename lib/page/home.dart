@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:recipe_book/component/food_card.dart';
 import 'package:recipe_book/domain/recipe.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:recipe_book/provider/home_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -15,65 +15,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _textEditingController = TextEditingController();
-  bool _isLoading = false;
-  List<Recipe> _listRecipe = [];
-
-  Future<List<Recipe>?> _getListRecipe({String search = 'pizza'}) async {
-    setState(() {
-      _isLoading = true;
-    });
-    String baseUrl =
-        dotenv.env['BASE_URL'] ?? 'https://api.edamam.com/api/recipes';
-    String appId = dotenv.env['APP_ID'] ?? '';
-    String appKey = dotenv.env['APP_KEY'] ?? '';
-
-    try {
-      var response = await Dio().get(
-          '$baseUrl/v2?app_id=$appId&app_key=$appKey&type=public&q=$search');
-      if (response.data != null) {
-        var listRecipeJson = (response.data['hits'] ?? []) as List<dynamic>;
-        List<Recipe> listRecipe = listRecipeJson.map((e) {
-          var ingredientsJson =
-              (e['recipe']['ingredients'] ?? []) as List<dynamic>;
-
-          String ingredientMapper(Map<String, dynamic> ingredient) {
-            return ingredient['text'];
-          }
-
-          List<String> ingredients =
-              ingredientsJson.map(((e) => ingredientMapper(e))).toList();
-
-          return Recipe(
-            id: '',
-            name: e['recipe']['label'] ?? '',
-            imageUrl: e['recipe']['image'] ?? '',
-            source: e['recipe']['source'] ?? '',
-            calories: e['recipe']['calories'] ?? 0,
-            totalIngredients: ingredientsJson.length,
-            ingredients: ingredients,
-          );
-        }).toList();
-        setState(() {
-          _isLoading = false;
-        });
-        return listRecipe;
-      } else {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      print(e);
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    _getListRecipe().then((value) => _listRecipe = value ?? []);
+    Provider.of<HomeProvider>(context, listen: false).getListRecipe();
   }
 
   @override
@@ -84,6 +30,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    HomeProvider homeData = Provider.of<HomeProvider>(context);
     return Scaffold(
       body: Container(
         padding: const EdgeInsets.fromLTRB(24, 48, 24, 0),
@@ -106,12 +53,7 @@ class _HomePageState extends State<HomePage> {
                 child: TextFormField(
                   controller: _textEditingController,
                   onFieldSubmitted: (text) {
-                    _getListRecipe(search: text).then((value) {
-                      setState(() {
-                        _listRecipe = value ?? [];
-                      });
-                    });
-                    ;
+                    homeData.getListRecipe(search: text);
                   },
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search),
@@ -133,13 +75,7 @@ class _HomePageState extends State<HomePage> {
               ),
               InkWell(
                 onTap: () {
-                  _getListRecipe(search: _textEditingController.text)
-                      .then((value) {
-                    setState(() {
-                      _listRecipe = value ?? [];
-                    });
-                  });
-                  ;
+                  homeData.getListRecipe(search: _textEditingController.text);
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -158,15 +94,15 @@ class _HomePageState extends State<HomePage> {
               height: 12,
             ),
             Expanded(
-              child: _isLoading
+              child: homeData.isLoading
                   ? Center(
                       child: CircularProgressIndicator(),
                     )
                   : Scrollbar(
                       child: ListView.builder(
-                          itemCount: _listRecipe.length,
+                          itemCount: homeData.listRecipe.length,
                           itemBuilder: (BuildContext context, int index) {
-                            Recipe recipe = _listRecipe[index];
+                            Recipe recipe = homeData.listRecipe[index];
                             return FoodCard(recipe: recipe);
                           }),
                     ),
